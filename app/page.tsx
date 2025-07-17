@@ -1,5 +1,5 @@
 'use client'
-import {  useEffect, useState } from 'react';
+import {  useEffect, useMemo, useState } from 'react';
 import {
   ConnectionProvider,
   WalletProvider,
@@ -9,6 +9,8 @@ import {
   WalletModalProvider,
 } from "@solana/wallet-adapter-react-ui";
 
+import { clusterApiUrl } from '@solana/web3.js';
+
 import WalletButtons from "./components/WalletButtons";
 import Airdrop from "./components/Airdrop";
 
@@ -17,6 +19,9 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 
 export default function App() {
   const [mounted, setMounted] = useState(false);
+  
+  const endpoint = useMemo(() => clusterApiUrl('devnet'), []);
+  
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -56,7 +61,7 @@ export default function App() {
   }
 
   return (
-    <ConnectionProvider endpoint={"https://solana-devnet.g.alchemy.com/v2/qT9w-C2po9DHCwHJ29AMi"}>
+    <ConnectionProvider endpoint={endpoint}>
       <WalletProvider 
         wallets={[]} 
         autoConnect={false}

@@ -6,7 +6,7 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js"
 export default function Airdrop() {
     const wallet = useWallet();
     const {connection} = useConnection();
-    const [amount, setAmount] = useState("");
+    const [amount, setAmount] = useState<string>(""); 
     const [loading, setLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -23,6 +23,8 @@ export default function Airdrop() {
                 <input 
                     type="number" 
                     placeholder="Enter Amount (SOL)" 
+                    value=""
+                    onChange={() => {}}
                     disabled
                     className="w-full p-2 border rounded mb-3 bg-gray-100"
                 />
@@ -49,16 +51,45 @@ export default function Airdrop() {
         }
 
         setLoading(true);
-        try {         
+        try {
+            console.log("Requesting airdrop for:", wallet.publicKey.toString());
+            console.log("Amount:", solAmount, "SOL");
+            console.log("Using RPC:", connection.rpcEndpoint);
+            
             const lamports = solAmount * LAMPORTS_PER_SOL;
+            console.log("Lamports:", lamports);
+            
             const signature = await connection.requestAirdrop(wallet.publicKey, lamports);
-
+            console.log("Airdrop signature:", signature);
             
             
+            const latestBlockHash = await connection.getLatestBlockhash();
+            await connection.confirmTransaction({
+                blockhash: latestBlockHash.blockhash,
+                lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+                signature: signature,
+            });
+            
+            console.log("Transaction confirmed!");
             alert(`Airdrop successful! ${solAmount} SOL sent to your wallet\nSignature: ${signature}`);
             setAmount(""); 
         } catch (error) {
             console.error("Airdrop error:", error);
+            
+            // Better error handling for common issues
+            if (error instanceof Error) {
+                if (error.message.includes("429") || error.message.includes("rate")) {
+                    alert("Rate limit exceeded. Please wait a few minutes before requesting another airdrop.");
+                } else if (error.message.includes("airdrop") || error.message.includes("insufficient")) {
+                    alert("Airdrop failed. The devnet faucet may be temporarily unavailable. Try a smaller amount or try again later.");
+                } else if (error.message.includes("blockhash") || error.message.includes("timeout")) {
+                    alert("Transaction timed out. Please try again.");
+                } else {
+                    alert(`Airdrop failed: ${error.message}\n\nTip: You can also use https://faucet.solana.com for manual airdrops.`);
+                }
+            } else {
+                alert("Airdrop failed: Unknown error. Try using https://faucet.solana.com for manual airdrops.");
+            }
             
         } finally {
             setLoading(false);
@@ -68,6 +99,7 @@ export default function Airdrop() {
     return (
         <div className="p-4 border rounded-lg bg-white shadow-sm">
             <h3 className="text-lg font-semibold mb-4">Request Airdrop</h3>
+            
             
             {wallet.connected && wallet.publicKey ? (
                 <p className="text-sm text-green-600 mb-2">
@@ -81,7 +113,7 @@ export default function Airdrop() {
                 type="number" 
                 placeholder="Enter Amount (SOL)" 
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => setAmount(e.target.value || "")}
                 max="2"
                 min="0.1"
                 step="0.1"
