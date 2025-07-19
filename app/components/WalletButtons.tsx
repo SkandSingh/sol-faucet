@@ -16,23 +16,23 @@ export default function WalletButtons() {
   // Prevent SSR mismatch by showing loading state until mounted
   if (!mounted) {
     return (
-      <div className="flex gap-4 mb-4">
-        <button disabled className="bg-gray-300 text-gray-500 px-4 py-2 rounded">
+      <div className="flex gap-4 justify-center">
+        <div className="bg-gray-700 animate-pulse text-gray-400 px-6 py-3 rounded-xl">
           Loading Wallet...
-        </button>
-        <button disabled className="bg-gray-300 text-gray-500 px-4 py-2 rounded">
+        </div>
+        <div className="bg-gray-700 animate-pulse text-gray-400 px-6 py-3 rounded-xl">
           Loading...
-        </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex gap-4 mb-4">
-      <div key="wallet-multi-button">
+    <div className="flex gap-4 justify-center flex-wrap">
+      <div key="wallet-multi-button" className="transform transition-transform hover:scale-105">
         <WalletMultiButton />
       </div>
-      <div key="wallet-disconnect-button">
+      <div key="wallet-disconnect-button" className="transform transition-transform hover:scale-105">
         <WalletDisconnectButton />
       </div>
     </div>

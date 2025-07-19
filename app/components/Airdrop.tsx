@@ -17,20 +17,22 @@ export default function Airdrop() {
     // Prevent SSR mismatch
     if (!mounted) {
         return (
-            <div className="p-4 border rounded-lg bg-white shadow-sm">
-                <h3 className="text-lg font-semibold mb-4">Request Airdrop</h3>
-                <p className="text-sm text-gray-600 mb-2">Loading airdrop component...</p>
+            <div className="glass-card rounded-2xl p-6">
+                <h3 className="text-xl font-semibold mb-6 text-white text-center">Request Airdrop</h3>
+                <div className="mb-4">
+                    <p className="text-gray-400 mb-2 text-center">Loading airdrop component...</p>
+                </div>
                 <input 
                     type="number" 
                     placeholder="Enter Amount (SOL)" 
                     value=""
                     onChange={() => {}}
                     disabled
-                    className="w-full p-2 border rounded mb-3 bg-gray-100"
+                    className="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder-gray-400 mb-4"
                 />
                 <button 
                     disabled
-                    className="w-full bg-gray-400 text-white p-2 rounded opacity-50"
+                    className="w-full bg-gray-700 text-gray-400 p-4 rounded-xl font-semibold"
                 >
                     Loading...
                 </button>
@@ -97,37 +99,83 @@ export default function Airdrop() {
     }
 
     return (
-        <div className="p-4 border rounded-lg bg-white shadow-sm">
-            <h3 className="text-lg font-semibold mb-4">Request Airdrop</h3>
+        <div className="glass-card rounded-2xl p-6">
+            <h3 className="text-xl font-semibold mb-6 text-white text-center flex items-center justify-center gap-2">
+                <span className="text-2xl">💧</span>
+                Request Airdrop
+            </h3>
             
+            {/* Connection Status */}
+            <div className="mb-6">
+                {wallet.connected && wallet.publicKey ? (
+                    <div className="bg-green-900/30 border border-green-500/30 rounded-xl p-4 text-center">
+                        <p className="text-green-400 font-medium flex items-center justify-center gap-2">
+                            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                            Wallet Connected
+                        </p>
+                        <p className="text-green-300 text-sm mt-1 font-mono">
+                            {wallet.publicKey.toString().slice(0, 8)}...{wallet.publicKey.toString().slice(-8)}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="bg-red-900/30 border border-red-500/30 rounded-xl p-4 text-center">
+                        <p className="text-red-400 font-medium flex items-center justify-center gap-2">
+                            <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+                            Please connect your wallet first
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* Amount Input */}
+            <div className="mb-6">
+                <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Amount (SOL)
+                </label>
+                <div className="relative">
+                    <input 
+                        type="number" 
+                        placeholder="Enter amount (0.1 - 2.0)" 
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value || "")}
+                        max="2"
+                        min="0.1"
+                        step="0.1"
+                        className="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder-gray-400 dark-input transition-all duration-200 pr-16"
+                        disabled={loading}
+                    />
+                    <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium">
+                        SOL
+                    </div>
+                </div>
+                <p className="text-gray-400 text-xs mt-2">Maximum 2 SOL per request</p>
+            </div>
             
-            {wallet.connected && wallet.publicKey ? (
-                <p className="text-sm text-green-600 mb-2">
-                    Wallet Connected: {wallet.publicKey.toString().slice(0, 8)}...
-                </p>
-            ) : (
-                <p className="text-sm text-red-600 mb-2">Please connect your wallet first</p>
-            )}
-            
-            <input 
-                type="number" 
-                placeholder="Enter Amount (SOL)" 
-                value={amount}
-                onChange={(e) => setAmount(e.target.value || "")}
-                max="2"
-                min="0.1"
-                step="0.1"
-                className="w-full p-2 border rounded mb-3"
-                disabled={loading}
-            />
-            
+            {/* Airdrop Button */}
             <button 
                 onClick={sendAirdrop} 
                 disabled={loading || !wallet.connected}
-                className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-700 disabled:to-gray-700 text-white p-4 rounded-xl font-semibold transition-all duration-200 glow-button disabled:cursor-not-allowed disabled:transform-none"
             >
-                {loading ? "Requesting..." : "Send Airdrop"}
+                {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Requesting Airdrop...
+                    </span>
+                ) : (
+                    <span className="flex items-center justify-center gap-2">
+                        <span>💰</span>
+                        Send Airdrop
+                    </span>
+                )}
             </button>
+
+            {/* Info */}
+            <div className="mt-6 text-center">
+                <p className="text-gray-400 text-xs">
+                    Free SOL tokens for Solana devnet testing
+                </p>
+            </div>
         </div>
     )
 }
